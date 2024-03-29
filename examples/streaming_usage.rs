@@ -3,6 +3,8 @@
 use anthropic_sdk::Client;
 use dotenv::dotenv;
 use serde_json::json;
+use std::sync::{Arc, Mutex};
+// use tokio::time::{sleep, Duration};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -21,19 +23,31 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .stream(true)
         .build()?;
 
-    let mut message = String::new();
+    let message = Arc::new(Mutex::new(String::new()));
+    let message_clone = message.clone();
 
     if let Err(error) = request
-        .execute(|text| {
-            println!("{text}"); // use the stream at this point
-            message = format!("{message}{text}");
+        .execute(move |text| {
+            let message_clone = message_clone.clone();
+            async move {
+                println!("{text}");
+
+                {
+                    let mut message = message_clone.lock().unwrap();
+                    *message = format!("{}{}", *message, text);
+                    drop(message);
+                }
+                // Mimic async process
+                // sleep(Duration::from_millis(200)).await; 
+            }
         })
         .await
     {
         eprintln!("Error: {error}");
     }
 
-    println!("Message: {message}"); // or get the whole message at the end
+    let final_message = message.lock().unwrap();
+    println!("Message: {}", *final_message); // or get the whole message at the end
 
     Ok(())
 }

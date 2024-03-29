@@ -4,6 +4,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use types::AnthropicChatCompletionChunk;
 mod types;
+use futures::future::Future;
 
 #[derive(Serialize)]
 struct ApiRequestBody<'a> {
@@ -48,7 +49,7 @@ impl Client {
             max_tokens: 1024,
             stream: false,
             temperature: 0.0,
-            system: String::new()
+            system: String::new(),
         }
     }
 
@@ -118,9 +119,10 @@ pub struct Request {
 }
 
 impl Request {
-    pub async fn execute<F>(self, mut callback: F) -> Result<()>
+    pub async fn execute<F, Fut>(self, mut callback: F) -> Result<()>
     where
-        F: FnMut(&str),
+        F: FnMut(String) -> Fut,
+        Fut: Future<Output = ()> + Send,
     {
         let mut response = self
             .request_builder
@@ -165,7 +167,8 @@ impl Request {
                                     Ok(d) => {
                                         if let Some(delta) = d.delta {
                                             if let Some(content) = delta.text {
-                                                callback(&content);
+                                                let content_owned = content.to_owned();
+                                                callback(content_owned).await;
                                             }
                                         }
                                     }
@@ -193,7 +196,8 @@ impl Request {
                                 .iter()
                                 .find(|c| c.content_type == "text")
                             {
-                                callback(&content.text);
+                                let content_owned = content.text.to_owned();
+                                callback(content_owned).await;
                             }
                         }
                         Err(_) => return Err(anyhow!("Unable to parse JSON")),
