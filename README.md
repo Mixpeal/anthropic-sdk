@@ -48,12 +48,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .max_tokens(1024)
         .build()?;
 
-    if let Err(error) = request
-        .execute(|text| async move {
-            println!("{text}");
-        })
-        .await
-    {
+    if let Err(error) = request.execute(|text| println!("{text}")).await {
         eprintln!("Error: {error}");
     }
 
@@ -74,7 +69,6 @@ use anthropic_sdk::Client;
 use dotenv::dotenv;
 use serde_json::json;
 use std::sync::{Arc, Mutex};
-// use tokio::time::{sleep, Duration};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -99,16 +93,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if let Err(error) = request
         .execute(move |text| {
             let message_clone = message_clone.clone();
-            async move {
-                println!("{text}");
+            println!("{text}");
 
-                {
-                    let mut message = message_clone.lock().unwrap();
-                    *message = format!("{}{}", *message, text);
-                    drop(message);
-                }
-                // Mimic async process
-                // sleep(Duration::from_millis(200)).await; 
+            {
+                let mut message = message_clone.lock().unwrap();
+                *message = format!("{}{}", *message, text);
+                drop(message);
             }
         })
         .await

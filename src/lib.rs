@@ -4,7 +4,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use types::AnthropicChatCompletionChunk;
 mod types;
-use futures::future::Future;
 
 #[derive(Serialize)]
 struct ApiRequestBody<'a> {
@@ -121,7 +120,7 @@ pub struct Request {
 impl Request {
     pub async fn execute<F>(self, mut callback: F) -> Result<()>
     where
-        F: FnMut(&str),
+        F: FnMut(&str) + Send + 'static,
     {
         let mut response = self
             .request_builder
