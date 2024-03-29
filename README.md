@@ -2,12 +2,12 @@
 
 The Anthropic SDK for Rust provides a simple and efficient way to interact with the Anthropic API, allowing you to send requests and process responses asynchronously. This SDK supports both streaming and non-streaming responses, making it versatile for different use cases.
 
-### Features
+### Features ✨
 
-- Asynchronous request handling
-- Support for streaming API responses
-- Easy configuration for authentication and request parameters
-- Error handling with detailed messages
+- Asynchronous request handling 🚀
+- Support for streaming API responses 🌊
+- Easy configuration for authentication and request parameters 🔧
+- Error handling with detailed messages 🛠️💬
 
 ### Installation
 
