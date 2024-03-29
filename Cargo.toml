@@ -2,8 +2,14 @@
 name = "anthropic-sdk"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Kayode Ojo <@mixpeal>"]
+license = "MIT"
+homepage = "https://github.com/mixpeal/anthropic-sdk"
+repository = "https://github.com/mixpeal/antrhopic-sdk"
+categories = ["api-bindings", "web-programming", "asynchronous"]
+keywords = ["llm", "anthropic", "async", "ai", "gpt", "claude", "vision"]
+description = "Anthropic Rust SDK."
+readme = "README.md"
 
 [dependencies]
 anyhow = "1.0"
