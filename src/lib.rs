@@ -8,7 +8,7 @@ mod types;
 #[derive(Serialize)]
 struct ApiRequestBody<'a> {
     model: &'a str,
-    max_tokens: u32,
+    max_tokens: i32,
     messages: &'a Value,
     stream: bool,
     temperature: f32,
@@ -20,7 +20,7 @@ pub struct Client {
     secret_key: String,
     model: String,
     messages: Value,
-    max_tokens: u32,
+    max_tokens: i32,
     stream: bool,
     temperature: f32,
     system: String,
@@ -67,7 +67,7 @@ impl Client {
         self
     }
 
-    pub fn max_tokens(mut self, max_tokens: u32) -> Self {
+    pub fn max_tokens(mut self, max_tokens: i32) -> Self {
         self.max_tokens = max_tokens;
         self
     }
