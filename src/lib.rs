@@ -119,10 +119,9 @@ pub struct Request {
 }
 
 impl Request {
-    pub async fn execute<F, Fut>(self, mut callback: F) -> Result<()>
+    pub async fn execute<F>(self, mut callback: F) -> Result<()>
     where
-        F: FnMut(String) -> Fut,
-        Fut: Future<Output = ()> + Send,
+        F: FnMut(&str),
     {
         let mut response = self
             .request_builder
@@ -167,8 +166,7 @@ impl Request {
                                     Ok(d) => {
                                         if let Some(delta) = d.delta {
                                             if let Some(content) = delta.text {
-                                                let content_owned = content.to_owned();
-                                                callback(content_owned).await;
+                                                callback(&content);
                                             }
                                         }
                                     }
@@ -196,8 +194,7 @@ impl Request {
                                 .iter()
                                 .find(|c| c.content_type == "text")
                             {
-                                let content_owned = content.text.to_owned();
-                                callback(content_owned).await;
+                                callback(&content.text);
                             }
                         }
                         Err(_) => return Err(anyhow!("Unable to parse JSON")),

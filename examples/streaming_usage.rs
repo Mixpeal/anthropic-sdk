@@ -4,7 +4,7 @@ use anthropic_sdk::Client;
 use dotenv::dotenv;
 use serde_json::json;
 use std::sync::{Arc, Mutex};
-// use tokio::time::{sleep, Duration};
+use tokio::time::{sleep, Duration};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -27,19 +27,19 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let message_clone = message.clone();
 
     if let Err(error) = request
-        .execute(move |text| {
+        .execute(|text| {
             let message_clone = message_clone.clone();
-            async move {
-                println!("{text}");
+            println!("{text}");
 
-                {
-                    let mut message = message_clone.lock().unwrap();
-                    *message = format!("{}{}", *message, text);
-                    drop(message);
-                }
-                // Mimic async process
-                // sleep(Duration::from_millis(200)).await; 
+            {
+                let mut message = message_clone.lock().unwrap();
+                *message = format!("{}{}", *message, text);
+                drop(message);
             }
+            // Mimic async process
+            tokio::spawn(async move {
+                sleep(Duration::from_millis(200)).await;
+            });
         })
         .await
     {
