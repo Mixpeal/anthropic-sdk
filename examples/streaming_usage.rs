@@ -15,6 +15,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .messages(&json!([
             {"role": "user", "content": "Write me a poem about bravery"}
         ]))
+        .system("Make it sound like Edgar Allan Poe")
+        .temperature(0.1)
         .max_tokens(1024)
         .stream(true)
         .build()?;

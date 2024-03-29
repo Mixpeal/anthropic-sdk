@@ -11,6 +11,8 @@ struct ApiRequestBody<'a> {
     max_tokens: u32,
     messages: &'a Value,
     stream: bool,
+    temperature: f32,
+    system: &'a str,
 }
 
 pub struct Client {
@@ -20,6 +22,8 @@ pub struct Client {
     messages: Value,
     max_tokens: u32,
     stream: bool,
+    temperature: f32,
+    system: String,
 }
 
 #[derive(Deserialize)]
@@ -43,6 +47,8 @@ impl Client {
             messages: Value::Null,
             max_tokens: 1024,
             stream: false,
+            temperature: 0.0,
+            system: String::new()
         }
     }
 
@@ -66,6 +72,16 @@ impl Client {
         self
     }
 
+    pub fn temperature(mut self, temperature: f32) -> Self {
+        self.temperature = temperature.to_owned();
+        self
+    }
+
+    pub fn system(mut self, system: &str) -> Self {
+        self.system = system.to_owned();
+        self
+    }
+
     pub fn stream(mut self, stream: bool) -> Self {
         self.stream = stream;
         self
@@ -77,6 +93,8 @@ impl Client {
             max_tokens: self.max_tokens,
             messages: &self.messages,
             stream: self.stream,
+            temperature: self.temperature,
+            system: &self.system,
         };
 
         let request_builder = self

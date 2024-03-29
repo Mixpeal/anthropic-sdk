@@ -1,1 +1,0 @@
-/Users/mixpeal/Documents/rust-apps/crates/anthropic_sdk/target/debug/examples/basic_usage: /Users/mixpeal/Documents/rust-apps/crates/anthropic_sdk/examples/basic_usage.rs /Users/mixpeal/Documents/rust-apps/crates/anthropic_sdk/src/lib.rs /Users/mixpeal/Documents/rust-apps/crates/anthropic_sdk/src/types.rs
