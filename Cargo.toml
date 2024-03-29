@@ -2,12 +2,12 @@
 name = "anthropic-sdk"
 version = "0.0.1"
 edition = "2021"
-authors = ["Kayode Ojo <@mixpeal>"]
+authors = ["Kayode Ojo <hello@mixpeal.com>"]
 license = "MIT"
 homepage = "https://github.com/mixpeal/anthropic-sdk"
 repository = "https://github.com/mixpeal/antrhopic-sdk"
 categories = ["api-bindings", "web-programming", "asynchronous"]
-keywords = ["llm", "anthropic", "async", "ai", "gpt", "claude", "vision"]
+keywords = ["llm", "anthropic","ai", "gpt", "claude"]
 description = "Anthropic Rust SDK."
 readme = "README.md"
 

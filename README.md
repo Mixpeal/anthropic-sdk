@@ -116,6 +116,12 @@ ANTHROPIC_API_KEY=your_api_key_here
 
 Alternatively, you can set the `ANTHROPIC_API_KEY` environment variable in your system.
 
+
+### Feature Requests 📬
+
+If you have any ideas or requests for new features, we'd love to hear from you! Please send your suggestions to [hello@mixpeal.com](mailto:hello@mixpeal.com), and we'll be sure to consider them for future updates. Your input is invaluable in helping us improve! 🌟🚀
+
+
 ### Error Handling
 
 The SDK provides detailed error messages for various failure scenarios, such as network issues, invalid parameters, or unauthorized access. Errors are returned as `Result` types, allowing you to handle them using idiomatic Rust error handling patterns.
