@@ -118,9 +118,10 @@ pub struct Request {
 }
 
 impl Request {
-    pub async fn execute<F>(self, mut callback: F) -> Result<()>
+    pub async fn execute<F, Fut>(self, mut callback: F) -> Result<()>
     where
-        F: FnMut(&str) + Send + 'static,
+        F: FnMut(String) -> Fut,
+        Fut: std::future::Future<Output = ()> + Send,
     {
         let mut response = self
             .request_builder
@@ -165,7 +166,7 @@ impl Request {
                                     Ok(d) => {
                                         if let Some(delta) = d.delta {
                                             if let Some(content) = delta.text {
-                                                callback(&content);
+                                                callback(content).await;
                                             }
                                         }
                                     }
@@ -193,7 +194,7 @@ impl Request {
                                 .iter()
                                 .find(|c| c.content_type == "text")
                             {
-                                callback(&content.text);
+                                callback(content.text.clone()).await;
                             }
                         }
                         Err(_) => return Err(anyhow!("Unable to parse JSON")),
@@ -210,3 +211,4 @@ impl Request {
         }
     }
 }
+

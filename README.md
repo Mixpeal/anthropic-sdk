@@ -15,7 +15,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-anthropic_sdk = "0.0.6"
+anthropic_sdk = "0.0.7"
 dotenv = "0.15.0"
 serde_json = "1.0"
 tokio = { version = "1.0", features = ["full"] }
@@ -48,7 +48,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .max_tokens(1024)
         .build()?;
 
-    if let Err(error) = request.execute(|text| println!("{text}")).await {
+    if let Err(error) = request
+        .execute(|text| async move { println!("{text}") })
+        .await
+    {
         eprintln!("Error: {error}");
     }
 
@@ -90,15 +93,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let message = Arc::new(Mutex::new(String::new()));
     let message_clone = message.clone();
 
+    // NOTE: you should spawn a new thread if you need to
     if let Err(error) = request
         .execute(move |text| {
             let message_clone = message_clone.clone();
-            println!("{text}");
+            async move {
+                println!("{text}");
 
-            {
-                let mut message = message_clone.lock().unwrap();
-                *message = format!("{}{}", *message, text);
-                drop(message);
+                {
+                    let mut message = message_clone.lock().unwrap();
+                    *message = format!("{}{}", *message, text);
+                    drop(message);
+                }
+                // Mimic async process
+                // tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
             }
         })
         .await

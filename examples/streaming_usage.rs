@@ -25,15 +25,20 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let message = Arc::new(Mutex::new(String::new()));
     let message_clone = message.clone();
 
+    // NOTE: you should spawn a new thread if you need to
     if let Err(error) = request
         .execute(move |text| {
             let message_clone = message_clone.clone();
-            println!("{text}");
+            async move {
+                println!("{text}");
 
-            {
-                let mut message = message_clone.lock().unwrap();
-                *message = format!("{}{}", *message, text);
-                drop(message);
+                {
+                    let mut message = message_clone.lock().unwrap();
+                    *message = format!("{}{}", *message, text);
+                    drop(message);
+                }
+                // Mimic async process
+                // tokio::time::sleep(tokio::time::Duration::from_millis(200)).await;
             }
         })
         .await
