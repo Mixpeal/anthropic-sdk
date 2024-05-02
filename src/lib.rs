@@ -249,10 +249,10 @@ impl Request {
                 }
                 Ok(())
             }
-            StatusCode::BAD_REQUEST => Err(anyhow!("Bad request. Check your request parameters.")),
-            StatusCode::UNAUTHORIZED => Err(anyhow!("Unauthorized. Check your authorization.")),
+            StatusCode::BAD_REQUEST => Err(anyhow!("Bad request. Check your request parameters. {}", response.text().await?)),
+            StatusCode::UNAUTHORIZED => Err(anyhow!("Unauthorized. Check your authorization key.")),
             _ => {
-                let error_message = format!("Unexpected status code: {:?}", response.status());
+                let error_message = format!("Unexpected status code: {:?}", response.text().await?);
                 Err(anyhow!(error_message))
             }
         }
