@@ -35,6 +35,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "content": "What is the weather like in San Francisco?"
           }
         ]))
+        .metadata(&json!({"user_id": "111"}))
         .max_tokens(1024)
         .build()?;
 

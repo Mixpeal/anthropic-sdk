@@ -1,21 +1,10 @@
 use anyhow::{anyhow, Context, Result};
 use reqwest::{Client as ReqwestClient, Error as ReqwestError, RequestBuilder, StatusCode};
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::{json, Value};
 use types::AnthropicChatCompletionChunk;
 mod types;
 use std::collections::HashMap;
-
-#[derive(Serialize)]
-struct ApiRequestBody<'a> {
-    model: &'a str,
-    max_tokens: i32,
-    messages: &'a Value,
-    tools: &'a Value,
-    stream: bool,
-    temperature: f32,
-    system: &'a str,
-}
 
 pub struct Client {
     client: ReqwestClient,
@@ -23,13 +12,17 @@ pub struct Client {
     model: String,
     messages: Value,
     tools: Value,
+    metadata: Value,
     max_tokens: i32,
     stream: bool,
     verbose: bool,
     temperature: f32,
     system: String,
     version: String,
+    stop_sequences: Vec<String>,
     beta: Option<String>,
+    top_k: Option<i32>,
+    top_p: Option<f64>,
 }
 
 #[derive(Deserialize)]
@@ -52,13 +45,17 @@ impl Client {
             model: String::new(),
             messages: Value::Null,
             tools: Value::Null,
+            metadata: Value::Null,
             max_tokens: 1024,
             stream: false,
             verbose: false,
             temperature: 0.0,
             system: String::new(),
             version: "2023-06-01".to_string(),
+            stop_sequences: Vec::new(),
             beta: None,
+            top_k: None,
+            top_p: None,
         }
     }
 
@@ -79,6 +76,11 @@ impl Client {
 
     pub fn tools(mut self, tools: &Value) -> Self {
         self.tools = tools.clone();
+        self
+    }
+
+    pub fn metadata(mut self, metadata: &Value) -> Self {
+        self.metadata = metadata.clone();
         self
     }
 
@@ -105,6 +107,7 @@ impl Client {
         self.stream = stream;
         self
     }
+
     pub fn verbose(mut self, verbose: bool) -> Self {
         self.verbose = verbose;
         self
@@ -112,6 +115,21 @@ impl Client {
 
     pub fn beta(mut self, beta: &str) -> Self {
         self.beta = Some(beta.to_owned());
+        self
+    }
+
+    pub fn stop_sequences(mut self, stop_sequences: Vec<String>) -> Self {
+        self.stop_sequences = stop_sequences;
+        self
+    }
+
+    pub fn top_k(mut self, top_k: i32) -> Self {
+        self.top_k = Some(top_k);
+        self
+    }
+
+    pub fn top_p(mut self, top_p: f64) -> Self {
+        self.top_p = Some(top_p);
         self
     }
 
@@ -126,6 +144,22 @@ impl Client {
 
         if self.tools != Value::Null {
             body_map.insert("tools", self.tools.clone());
+        }
+
+        if self.metadata != Value::Null {
+            body_map.insert("metadata", self.metadata.clone());
+        }
+
+        if self.stop_sequences.len() > 0 {
+            body_map.insert("stop_sequences", json!(self.stop_sequences));
+        }
+
+        if let Some(top_k) = self.top_k {
+            body_map.insert("top_k", json!(top_k));
+        }
+
+        if let Some(top_p) = self.top_p {
+            body_map.insert("top_p", json!(top_p));
         }
 
         let mut request_builder = self
@@ -249,7 +283,10 @@ impl Request {
                 }
                 Ok(())
             }
-            StatusCode::BAD_REQUEST => Err(anyhow!("Bad request. Check your request parameters. {}", response.text().await?)),
+            StatusCode::BAD_REQUEST => Err(anyhow!(
+                "Bad request. Check your request parameters. {}",
+                response.text().await?
+            )),
             StatusCode::UNAUTHORIZED => Err(anyhow!("Unauthorized. Check your authorization key.")),
             _ => {
                 let error_message = format!("Unexpected status code: {:?}", response.text().await?);

@@ -16,7 +16,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-anthropic_sdk = "0.0.9"
+anthropic_sdk = "0.1.0"
 dotenv = "0.15.0"
 serde_json = "1.0"
 tokio = { version = "1.0", features = ["full"] }
@@ -191,6 +191,10 @@ This example demonstrates how to use tools with the Anthropic API to perform spe
 - `system`: (Optional) Provides additional context or instructions for the response.
 - `tools`: (Optional) Specifies tools to use for specialized tasks.
 - `verbose`: (Optional) When set to true, returns the raw response from the API.
+- `metadata`: (Optional) Includes additional information about the request.
+- `stop_sequences`: (Optional) Specifies sequences where the API should stop generating further tokens.
+- `top_k`: (Optional) Limits the model to only sample from the top K most likely next tokens.
+- `top_p`: (Optional) Uses nucleus sampling to limit the model to a cumulative probability.
 
 ### Configuration
 
