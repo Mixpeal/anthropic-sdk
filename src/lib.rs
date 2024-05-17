@@ -6,6 +6,8 @@ use types::AnthropicChatCompletionChunk;
 mod types;
 use std::collections::HashMap;
 
+use crate::types::AnthropicErrorMessage;
+
 pub struct Client {
     client: ReqwestClient,
     secret_key: String,
@@ -231,6 +233,7 @@ impl Request {
                                         .trim_start_matches("event: content_block_stop")
                                         .trim_start_matches("event: message_delta")
                                         .trim_start_matches("event: message_stop")
+                                        .trim_start_matches("event: error")
                                         .to_string();
                                     let cleaned_string = &processed_chunk
                                         .trim_start()
@@ -247,10 +250,25 @@ impl Request {
                                             }
                                         }
                                         Err(_) => {
-                                            println!(
-                                                "Couldn't parse AnthropicChatCompletionChunk: {}",
-                                                &cleaned_string
-                                            );
+                                            match serde_json::from_str::<AnthropicErrorMessage>(
+                                                &cleaned_string,
+                                            ) {
+                                                Ok(error_message) => {
+                                                    eprintln!(
+                                                        "Error message received: {error_message:?}",
+                                                    );
+
+                                                    return Err(anyhow!(
+                                                        "Error message received: {error_message:?}",
+                                                    ));
+                                                }
+                                                Err(_) => {
+                                                    eprintln!(
+                                                        "Couldn't parse AnthropicChatCompletionChunk or AnthropicErrorMessage: {}",
+                                                        &cleaned_string
+                                                    );
+                                                }
+                                            }
                                         }
                                     }
                                 }

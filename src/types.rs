@@ -45,3 +45,18 @@ pub struct AnthropicChatCompletionChunk {
     pub delta: Option<AnthropicTextDelta>,
     pub message: Option<AnthropicMessage>
 }
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AnthropicErrorMessage {
+    #[serde(rename = "type")]
+    pub error_type: String,
+    pub error: AnthropicErrorDetails,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AnthropicErrorDetails {
+    pub details: Option<serde_json::Value>,
+    #[serde(rename = "type")]
+    pub error_type: String,
+    pub message: String,
+}
