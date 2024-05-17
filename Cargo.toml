@@ -1,6 +1,6 @@
 [package]
 name = "anthropic-sdk"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 authors = ["Kayode Ojo <hello@mixpeal.com>"]
 license = "MIT"
