@@ -233,7 +233,6 @@ impl Request {
                                         .trim_start_matches("event: content_block_stop")
                                         .trim_start_matches("event: message_delta")
                                         .trim_start_matches("event: message_stop")
-                                        .trim_start_matches("event: error")
                                         .to_string();
                                     let cleaned_string = &processed_chunk
                                         .trim_start()
@@ -250,14 +249,18 @@ impl Request {
                                             }
                                         }
                                         Err(_) => {
+                                            let processed_chunk = cleaned_string
+                                                .trim_start_matches("event: error")
+                                                .to_string();
+                                            let cleaned_string = &processed_chunk
+                                                .trim_start()
+                                                .strip_prefix("data: ")
+                                                .unwrap_or(&processed_chunk);
                                             match serde_json::from_str::<AnthropicErrorMessage>(
                                                 &cleaned_string,
                                             ) {
                                                 Ok(error_message) => {
-                                                    eprintln!(
-                                                        "Error message received: {error_message:?}",
-                                                    );
-                                                    // return Err(anyhow!("{error_message:?}"));
+                                                    return Err(anyhow!("{}: {}", error_message.error.error_type, error_message.error.message));
                                                 }
                                                 Err(_) => {
                                                     eprintln!(
