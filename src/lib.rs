@@ -254,13 +254,7 @@ impl Request {
                                                 &cleaned_string,
                                             ) {
                                                 Ok(error_message) => {
-                                                    eprintln!(
-                                                        "Error message received: {error_message:?}",
-                                                    );
-
-                                                    return Err(anyhow!(
-                                                        "Error message received: {error_message:?}",
-                                                    ));
+                                                    return Err(anyhow!("{error_message:?}"));
                                                 }
                                                 Err(_) => {
                                                     eprintln!(
