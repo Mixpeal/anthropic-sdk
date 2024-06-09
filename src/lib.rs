@@ -183,6 +183,50 @@ impl Client {
             tools: self.tools,
         })
     }
+
+    pub fn builder(self) -> Result<RequestBuilder, ReqwestError> {
+        let mut body_map: HashMap<&str, Value> = HashMap::new();
+        body_map.insert("model", json!(self.model));
+        body_map.insert("max_tokens", json!(self.max_tokens));
+        body_map.insert("messages", json!(self.messages));
+        body_map.insert("stream", json!(self.stream));
+        body_map.insert("temperature", json!(self.temperature));
+        body_map.insert("system", json!(self.system));
+
+        if self.tools != Value::Null {
+            body_map.insert("tools", self.tools.clone());
+        }
+
+        if self.metadata != Value::Null {
+            body_map.insert("metadata", self.metadata.clone());
+        }
+
+        if self.stop_sequences.len() > 0 {
+            body_map.insert("stop_sequences", json!(self.stop_sequences));
+        }
+
+        if let Some(top_k) = self.top_k {
+            body_map.insert("top_k", json!(top_k));
+        }
+
+        if let Some(top_p) = self.top_p {
+            body_map.insert("top_p", json!(top_p));
+        }
+
+        let mut request_builder = self
+            .client
+            .post("https://api.anthropic.com/v1/messages")
+            .header("x-api-key", self.secret_key)
+            .header("anthropic-version", self.version)
+            .header("content-type", "application/json")
+            .json(&body_map);
+
+        if let Some(beta_value) = self.beta {
+            request_builder = request_builder.header("anthropic-beta", beta_value);
+        }
+
+        Ok(request_builder)
+    }
 }
 
 pub struct Request {
