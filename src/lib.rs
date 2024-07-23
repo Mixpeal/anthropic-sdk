@@ -7,6 +7,7 @@ mod types;
 use std::collections::HashMap;
 
 use crate::types::AnthropicErrorMessage;
+pub use types::ToolChoice;
 
 pub struct Client {
     client: ReqwestClient,
@@ -14,6 +15,7 @@ pub struct Client {
     model: String,
     messages: Value,
     tools: Value,
+    tool_choice: Option<types::ToolChoice>,
     metadata: Value,
     max_tokens: i32,
     stream: bool,
@@ -47,6 +49,7 @@ impl Client {
             model: String::new(),
             messages: Value::Null,
             tools: Value::Null,
+            tool_choice: None,
             metadata: Value::Null,
             max_tokens: 1024,
             stream: false,
@@ -78,6 +81,11 @@ impl Client {
 
     pub fn tools(mut self, tools: &Value) -> Self {
         self.tools = tools.clone();
+        self
+    }
+
+    pub fn tool_choice(mut self, tool_choice: types::ToolChoice) -> Self {
+        self.tool_choice = Some(tool_choice);
         self
     }
 
@@ -146,6 +154,9 @@ impl Client {
 
         if self.tools != Value::Null {
             body_map.insert("tools", self.tools.clone());
+        }
+        if let Some(tool_choice) = self.tool_choice {
+            body_map.insert("tool_choice", json!(tool_choice));
         }
 
         if self.metadata != Value::Null {
