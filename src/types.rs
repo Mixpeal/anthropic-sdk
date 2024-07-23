@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AnthropicUsage {
@@ -59,4 +59,24 @@ pub struct AnthropicErrorDetails {
     #[serde(rename = "type")]
     pub error_type: String,
     pub message: String,
+}
+
+#[derive(Debug)]
+pub enum ToolChoice {
+    Auto,
+    Any,
+    Tool(String),
+}
+
+impl Serialize for ToolChoice {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match self {
+            ToolChoice::Auto => serde::Serialize::serialize(&serde_json::json!({"type": "auto"}), serializer),
+            ToolChoice::Any => serde::Serialize::serialize(&serde_json::json!({"type": "any"}), serializer),
+            ToolChoice::Tool(name) => serde::Serialize::serialize(&serde_json::json!({"type": "tool", "name": name}), serializer),
+        }
+    }
 }

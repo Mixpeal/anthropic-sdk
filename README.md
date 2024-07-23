@@ -190,6 +190,7 @@ This example demonstrates how to use tools with the Anthropic API to perform spe
 - `temperature`: (Optional) Adjusts the randomness of the response generation.
 - `system`: (Optional) Provides additional context or instructions for the response.
 - `tools`: (Optional) Specifies tools to use for specialized tasks.
+- `tool_choice`: (Optional) Specifies the tool to use when multiple tools are available.
 - `verbose`: (Optional) When set to true, returns the raw response from the API.
 - `metadata`: (Optional) Includes additional information about the request.
 - `stop_sequences`: (Optional) Specifies sequences where the API should stop generating further tokens.
