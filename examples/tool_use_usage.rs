@@ -1,6 +1,6 @@
 // examples/tool_use_usage.rs
 
-use anthropic_sdk::Client;
+use anthropic_sdk::{Client, ToolChoice};
 use dotenv::dotenv;
 use serde_json::json;
 
@@ -29,6 +29,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
           }
         ]))
+        .tool_choice(ToolChoice::Auto)
         .messages(&json!([
           {
             "role": "user",

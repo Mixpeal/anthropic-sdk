@@ -16,7 +16,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-anthropic_sdk = "0.1.4"
+anthropic_sdk = "0.1.5"
 dotenv = "0.15.0"
 serde_json = "1.0"
 tokio = { version = "1.0", features = ["full"] }
@@ -129,7 +129,7 @@ For using Anthropic `Tool use`, the SDK can be used as follows:
 ```rust
 // examples/tool_use_usage.rs
 
-use anthropic_sdk::Client;
+use anthropic_sdk::{Client, ToolChoice};
 use dotenv::dotenv;
 use serde_json::json;
 
@@ -141,7 +141,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let request = Client::new()
         .auth(secret_key.as_str())
         .model("claude-3-opus-20240229")
-        .beta("tools-2024-04-04") // beta header is required
+        .beta("tools-2024-04-04") // add the beta header
         .tools(&json!([
           {
             "name": "get_weather",
@@ -158,6 +158,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             }
           }
         ]))
+        .tool_choice(ToolChoice::Auto)
         .messages(&json!([
           {
             "role": "user",
@@ -181,6 +182,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 This example demonstrates how to use tools with the Anthropic API to perform specific tasks, such as getting the weather.
 
 ### Fields Explanation
+
 - `version`: (Optional) Specifies the version of the API to use.
 - `auth`: Sets the authentication token for the API.
 - `model`: Defines the model to use for generating responses.
