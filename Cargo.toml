@@ -7,15 +7,27 @@ license = "MIT"
 homepage = "https://github.com/mixpeal/anthropic-sdk"
 repository = "https://github.com/mixpeal/anthropic-sdk"
 categories = ["api-bindings", "web-programming", "asynchronous"]
-keywords = ["llm", "anthropic","ai", "gpt", "claude"]
+keywords = ["llm", "anthropic", "ai", "gpt", "claude"]
 description = "Anthropic Rust SDK."
 readme = "README.md"
 
 [dependencies]
+reqwest = { version = "0.12", features = ["json"], default-features = false }
+serde = { version = "1.0", features = ["derive"], default-features = false }
+serde_json = { version = "1.0", default-features = false }
 anyhow = "1.0"
-dotenv = "0.15.0"
-futures = "0.3"
-reqwest = { version = "0.12", features = ["json"] }
-serde = { version = "1.0", features = ["derive"] }
-serde_json = "1.0"
-tokio = { version = "1", features = ["full"] }
+
+# Used for examples
+[dev-dependencies]
+dotenv = { version = "0.15", default-features = false }
+tokio = { version = "1", features = ["rt", "rt-multi-thread", "macros"], default-features = false }
+
+[features]
+# By default, use reqwest with rustls
+default = ["rustls"]
+
+# Enables TLS functionality provided by rustls, while using root certificates from the rustls-native-certs crate.
+rustls = ["reqwest/rustls-tls-native-roots"]
+
+# Enables TLS functionality provided by native-tls
+native-tls = ["reqwest/native-tls"]
