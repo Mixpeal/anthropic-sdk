@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize, Serializer};
+use serde_json::Value;
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AnthropicUsage {
@@ -7,10 +8,17 @@ pub struct AnthropicUsage {
 }
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct AnthropicContentBlock {
-    #[serde(rename = "type")]
-    pub content_type: String,
-    pub text: Option<String>,
+#[serde(tag = "type")]
+pub enum AnthropicContentBlock {
+    #[serde(rename = "text")]
+    AnthropicTextResponse { text: String },
+
+    #[serde(rename = "tool_use")]
+    AnthropicToolCallResponse {
+        id: String,
+        name: String,
+        input: Value,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
