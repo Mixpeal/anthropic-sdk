@@ -16,7 +16,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-anthropic_sdk = "0.1.5"
+anthropic-sdk = "0.1.5"
 dotenv = "0.15.0"
 serde_json = "1.0"
 tokio = { version = "1.0", features = ["full"] }

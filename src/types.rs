@@ -1,16 +1,24 @@
 use serde::{Deserialize, Serialize, Serializer};
+use serde_json::Value;
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct AnthropicUsage {
     pub input_tokens: Option<u32>,
     pub output_tokens: Option<u32>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct AnthropicContentBlock {
-    #[serde(rename = "type")]
-    pub content_type: String,
-    pub text: Option<String>,
+#[derive(Serialize, Deserialize, Debug, Clone)]
+#[serde(tag = "type")]
+pub enum AnthropicContentBlock {
+    #[serde(rename = "text")]
+    AnthropicTextResponse { text: String },
+
+    #[serde(rename = "tool_use")]
+    AnthropicToolCallResponse {
+        id: String,
+        name: String,
+        input: Value,
+    },
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -23,7 +31,7 @@ pub struct AnthropicTextDelta {
     pub usage: Option<AnthropicUsage>,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct AnthropicMessage {
     pub id: Option<String>,
     #[serde(rename = "type")]
@@ -43,7 +51,7 @@ pub struct AnthropicChatCompletionChunk {
     pub event_type: String,
     pub index: Option<usize>,
     pub delta: Option<AnthropicTextDelta>,
-    pub message: Option<AnthropicMessage>
+    pub message: Option<AnthropicMessage>,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -74,9 +82,16 @@ impl Serialize for ToolChoice {
         S: Serializer,
     {
         match self {
-            ToolChoice::Auto => serde::Serialize::serialize(&serde_json::json!({"type": "auto"}), serializer),
-            ToolChoice::Any => serde::Serialize::serialize(&serde_json::json!({"type": "any"}), serializer),
-            ToolChoice::Tool(name) => serde::Serialize::serialize(&serde_json::json!({"type": "tool", "name": name}), serializer),
+            ToolChoice::Auto => {
+                serde::Serialize::serialize(&serde_json::json!({"type": "auto"}), serializer)
+            }
+            ToolChoice::Any => {
+                serde::Serialize::serialize(&serde_json::json!({"type": "any"}), serializer)
+            }
+            ToolChoice::Tool(name) => serde::Serialize::serialize(
+                &serde_json::json!({"type": "tool", "name": name}),
+                serializer,
+            ),
         }
     }
 }

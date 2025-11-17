@@ -1,10 +1,10 @@
+pub mod types;
 use anyhow::{anyhow, Context, Result};
 use reqwest::{Client as ReqwestClient, Error as ReqwestError, RequestBuilder, StatusCode};
 use serde::Deserialize;
 use serde_json::{json, Value};
-use types::AnthropicChatCompletionChunk;
-mod types;
 use std::collections::HashMap;
+use types::AnthropicChatCompletionChunk;
 
 use crate::types::AnthropicErrorMessage;
 pub use types::ToolChoice;
@@ -315,7 +315,11 @@ impl Request {
                                                 &cleaned_string,
                                             ) {
                                                 Ok(error_message) => {
-                                                    return Err(anyhow!("{}: {}", error_message.error.error_type, error_message.error.message));
+                                                    return Err(anyhow!(
+                                                        "{}: {}",
+                                                        error_message.error.error_type,
+                                                        error_message.error.message
+                                                    ));
                                                 }
                                                 Err(_) => {
                                                     eprintln!(
